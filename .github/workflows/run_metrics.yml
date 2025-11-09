@@ -1,0 +1,29 @@
+name: Run Web Metrics
+
+on:
+  schedule:
+    # Ejecuta el script 3 veces al día: 7AM, 3PM y 11PM hora Colombia (UTC−5)
+    - cron: '0 12,20,4 * * *'
+  workflow_dispatch: {}  # Permite ejecución manual desde GitHub Actions
+
+jobs:
+  run-metrics:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run metrics collector
+        env:
+          PG_CONN: ${{ secrets.PG_CONN }}
+        run: python collect_metrics.py
