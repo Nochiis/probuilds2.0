@@ -114,16 +114,9 @@ def metric_ssl_validity_days(url):
 
 def metric_title_length(html):
     """Longitud del título HTML."""
-    soup = BeautifulSoup(html, "html.parser")
-    title = soup.title.string if soup.title else ""
-    return len(title)
-
 
 def metric_word_count(html):
     """Cantidad total de palabras visibles en la página."""
-    soup = BeautifulSoup(html, "html.parser")
-    text = soup.get_text()
-    return len(text.split())
 
 
 # -----------------------------------------------------------------------------
@@ -132,9 +125,6 @@ def metric_word_count(html):
 def main():
     conn = connect_db()
     cur = conn.cursor()
-
-    site_name = "Example"
-    base_url = "https://example.com"
 
     site_id = get_or_create_site(cur, site_name, base_url)
     page_id = get_or_create_page(cur, site_id, base_url)
@@ -201,18 +191,29 @@ def main():
     # Métrica 3: Palabras visibles
     # -----------------------
     word_count = metric_word_count(html)
+
+    site_name = "Example"
+    base_url = "https://example.com"
     metric_id = insert_metric(
         cur,
         "metric_word_count",
+    soup = BeautifulSoup(html, "html.parser")
+    text = soup.get_text()
+    return len(text.split())
         {
             "site_id": site_id,
             "page_id": page_id,
+    soup = BeautifulSoup(html, "html.parser")
+    title = soup.title.string if soup.title else ""
+    return len(title)
             "run_id": run_id,
+
             "word_count": word_count,
             "measured_at": datetime.now(),
         },
     )
     insert_main_result(
+
         cur,
         site_id,
         page_id,
@@ -233,3 +234,4 @@ def main():
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
     main()
+	
